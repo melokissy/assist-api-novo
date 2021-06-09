@@ -124,16 +124,21 @@ public class UserResource {
                 .build();
     }
 
-//    @RolesAllowed({"administrador"})
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response delete(@PathParam("id") String id, User user) {
         Integer idUser = 0;
-        idUser = Integer.parseInt(id);
-//        user.setId(Integer.parseInt(id));
+        idUser = Integer.parseInt(id);                
         user = this.userController.delete(idUser);
+        
+        if( user == null ){
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity("Não é possível excluir usuário")
+                .build();
+        }
+        
         return Response
                 .ok()
                 .entity(user)

@@ -37,22 +37,7 @@ public class TicketController {
 
     public Ticket insert(Ticket ticket) throws Exception {
         try {
-            User user = new User();
-            User userRequester = new User();
-            User newUser = new User();
-            user = ticket.getRequester(); 
-            userRequester = userController.getUserByCpf(user); 
-            
-            if (userRequester != null && userRequester.getCpf().equals(user.getCpf())) {
-                ticket.getRequester().setId(userRequester.getId());
-                
-            }else{
-                user.setPassword("123");
-                user.setProfile("Cliente");
-                newUser = userController.insert(user);
-                ticket.getRequester().setId(newUser.getId());
-            }
-            
+           
             int contador = tDAO.countTickets() + 1;
             if (contador < 100) {
                 ticket.setNumber("TICKET-" + "00" + contador);
@@ -60,7 +45,7 @@ public class TicketController {
             if (contador > 100) {
                 ticket.setNumber("TICKET-" + "0" + contador);
             }
-            
+                        
             tDAO.insertTicket(ticket);
 
         } catch (Exception e) {
@@ -150,7 +135,7 @@ public class TicketController {
         }
     }
     
-        public int countTicketByProject(Integer idProject) throws Exception {
+    public int countTicketByProject(Integer idProject) throws Exception {
         try {
             int contador = tDAO.countTicketsByProject(idProject);
             System.out.println("QTD NO CONTROLLER TICKET: " +contador);
@@ -160,7 +145,6 @@ public class TicketController {
             throw new Exception("Não foi possível localizar o ticket");
         }
     }
-
 
     public List<Ticket> ticketsVencidos() {
         List<Ticket> tickets = this.tDAO.ticketsVencidos();

@@ -113,7 +113,7 @@ public class ProjectResource {
 
         if (contador > 0) {
             return Response.status(Response.Status.BAD_REQUEST)
-                .entity("Não é possível excluir projeto que possui ticket")
+                .entity("Não é possível excluir projeto que possui ticket. O projeto pode ser desativo.")
                 .build();
         }
 

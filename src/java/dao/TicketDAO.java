@@ -80,6 +80,7 @@ public class TicketDAO {
             + "where t.responsible_id is not null group by t.responsible_id ";
     private static final String COUNT = "select count(*) from ticket";
     private static final String COUNT_BY_PROJECT = "select count(*) from ticket where project_id = ?";
+    private static final String COUNT_BY_REQUESTER = "select count(*) from ticket where requester_id = ?";
     private static final String TICKET_COMMENTS = "SELECT idComment, user_id, createdAt, comment FROM comment where idComment=?";
     private static final String TICKET_BY_PROJECT = "SELECT idTicket, subject , description, requester_id, type, priority, status, project_id, responsible_id, "
             + "createdAt, editedAt,dueDate, closedAt, number FROM ticket WHERE project_id = ?";
@@ -810,5 +811,5 @@ public class TicketDAO {
 
         return null;
     }
-
+    
 }
