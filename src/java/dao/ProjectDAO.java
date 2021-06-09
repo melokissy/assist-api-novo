@@ -181,9 +181,8 @@ public class ProjectDAO {
             }
         }
         return null;
-
     }
-
+    
     public Project delete(Project project) {
         Connection conn = null;
         PreparedStatement prepared = null;
@@ -246,6 +245,7 @@ public class ProjectDAO {
 
         return project;
     }
+    
     public Integer countProjects() {
         Connection conn = null;
         PreparedStatement prepared = null;

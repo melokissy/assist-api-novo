@@ -6,6 +6,7 @@
 package resource;
 
 import controller.ProjectController;
+import controller.TicketController;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -35,6 +36,7 @@ public class ProjectResource {
     private UriInfo context;
 
     private final ProjectController projectController;
+    private final TicketController ticketController = new TicketController();
 
     public ProjectResource() {
         this.projectController = new ProjectController();
@@ -84,7 +86,6 @@ public class ProjectResource {
                 .ok(Response.Status.CREATED)
                 .entity(project)
                 .build();
-
     }
 
     @PUT
@@ -104,10 +105,18 @@ public class ProjectResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response delete(@PathParam("id") String id, Project project) {
+    public Response delete(@PathParam("id") String id, Project project) throws Exception {
         Integer idProject = 0;
         idProject = Integer.parseInt(id);
-//        user.setId(Integer.parseInt(id));
+
+        int contador = ticketController.countTicketByProject(idProject);
+
+        if (contador > 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity("Não é possível excluir projeto que possui ticket")
+                .build();
+        }
+
         project = this.projectController.delete(idProject);
         return Response
                 .ok()

@@ -43,7 +43,7 @@ public class TicketDAO {
             + "                t.editedAt,  "
             + "                t.closedAt,  "
             + "                t.dueDate, "
-            +"t.number"
+            + "t.number"
             + "                FROM ticket t WHERE dueDate <= CURRENT_DATE() AND status != 'Resolvido' ORDER BY dueDate ASC ";
     private static final String AVENCER_TICKET = "SELECT distinct t.idTicket, "
             + "                t.subject,  "
@@ -57,12 +57,12 @@ public class TicketDAO {
             + "                t.editedAt,  "
             + "                t.closedAt,  "
             + "                t.dueDate, "
-            +"t.number"
+            + "t.number"
             + "                FROM ticket t WHERE status != 'resolvido' ORDER BY dueDate ASC ";
     private static final String APROPRIADO_TICKET = "select count(*) from ticket where responsible_id is not null AND responsible_id !=0 AND MONTH(createdAt) = MONTH(CURRENT_DATE())";
     private static final String TOTAL_TICKET = "select count(*) from ticket where MONTH(createdAt) = MONTH(CURRENT_DATE()) ";
     private static final String TICKETS = "SELECT distinct t.idTicket, "
-            +"t.number,"
+            + "t.number,"
             + "                t.subject,  "
             + "                t.description,  "
             + "                t.requester_id,  "
@@ -75,12 +75,14 @@ public class TicketDAO {
             + "                t.closedAt,  "
             + "                t.dueDate "
             + "                FROM ticket t order by number desc";
-    private static final String TOTAL_TK_USER = "SELECT count(*), t.responsible_id, u.name FROM ticket t  \n" 
-            + "inner join user u on t.responsible_id = u.idUser\n" 
+    private static final String TOTAL_TK_USER = "SELECT count(*), t.responsible_id, u.name FROM ticket t  \n"
+            + "inner join user u on t.responsible_id = u.idUser\n"
             + "where t.responsible_id is not null group by t.responsible_id ";
     private static final String COUNT = "select count(*) from ticket";
+    private static final String COUNT_BY_PROJECT = "select count(*) from ticket where project_id = ?";
     private static final String TICKET_COMMENTS = "SELECT idComment, user_id, createdAt, comment FROM comment where idComment=?";
-
+    private static final String TICKET_BY_PROJECT = "SELECT idTicket, subject , description, requester_id, type, priority, status, project_id, responsible_id, "
+            + "createdAt, editedAt,dueDate, closedAt, number FROM ticket WHERE project_id = ?";
 
     public TicketDAO() {
     }
@@ -176,7 +178,7 @@ public class TicketDAO {
                 ticket.setType(rs.getString(5));
                 ticket.setPriority(rs.getString(6));
                 ticket.setStatus(rs.getString(7));
-                
+
                 //pega o ususario projeto
                 Project project = new Project();
                 project.setId(rs.getInt(8));
@@ -192,7 +194,7 @@ public class TicketDAO {
                 ticket.setDueDate(rs.getDate(12));
                 ticket.setClosedAt(rs.getDate(13));
                 ticket.setNumber(rs.getString(14));
-                               
+
                 return ticket;
             }
 
@@ -219,8 +221,77 @@ public class TicketDAO {
         return null;
 
     }
-    
-    public Integer countTickets(){
+
+    //lista tickets por IDProject
+    public List<Ticket> ticketsByProject() {
+        Connection conn = null;
+        List<Ticket> list = null;
+        PreparedStatement prepared = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(TICKET_BY_PROJECT);
+
+            Project project = new Project();
+            prepared.setInt(1, project.getId());
+
+            rs = prepared.executeQuery();
+
+            while (rs.next()) {
+                Ticket ticket = new Ticket();
+                ticket.setId(rs.getInt(1));
+                ticket.setSubject(rs.getString(2));
+                ticket.setDescription(rs.getString(3));
+
+                User userRequest = new User();
+                userRequest.setId(rs.getInt(4));
+                ticket.setRequester(userRequest);
+
+                ticket.setType(rs.getString(5));
+                ticket.setPriority(rs.getString(6));
+                ticket.setStatus(rs.getString(7));
+
+                project.setId(rs.getInt(8));
+                ticket.setProject(project);
+
+                User userResponsible = new User();
+                userResponsible.setId(rs.getInt(9));
+                ticket.setResponsible(userResponsible);
+
+                ticket.setCreatedAt(rs.getDate(10));
+                ticket.setEditedAt(rs.getDate(11));
+                ticket.setDueDate(rs.getDate(12));
+                ticket.setClosedAt(rs.getDate(13));
+                ticket.setNumber(rs.getString(14));
+                list.add(ticket);
+            }
+
+            return list;
+        } catch (Exception e) {
+            System.out.println("ERROR LISTA TICKETS BY PROJECT - " + e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+
+                if (prepared != null) {
+                    prepared.close();
+                }
+
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error close connections" + ex.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    public Integer countTickets() {
         Connection conn = null;
         PreparedStatement prepared = null;
         ResultSet rs = null;
@@ -228,11 +299,49 @@ public class TicketDAO {
             conn = new ConnectionFactory().getConnection();
             prepared = conn.prepareStatement(COUNT);
             rs = prepared.executeQuery();
-            
-             if (rs.next()) {
+
+            if (rs.next()) {
                 Integer qtdTicket = null;
                 qtdTicket = rs.getInt(1);
                 return qtdTicket;
+            }
+        } catch (Exception ex) {
+            System.out.println("[CONTADOR DE TICKETS] - " + ex.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+
+                if (prepared != null) {
+                    prepared.close();
+                }
+
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error close connections" + ex.getMessage());
+            }
+        }
+        return null;
+    }
+    
+    // conta tickets pelo projecr
+    public Integer countTicketsByProject(int idProject) {
+        Connection conn = null;
+        PreparedStatement prepared = null;
+        ResultSet rs = null;
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(COUNT_BY_PROJECT);
+            prepared.setInt(1, idProject);
+            rs = prepared.executeQuery();
+
+            if (rs.next()) {
+                Integer qtdTicketProject = null;
+                qtdTicketProject = rs.getInt(1);
+                return qtdTicketProject;
             }
         } catch (Exception ex) {
             System.out.println("[CONTADOR DE TICKETS] - " + ex.getMessage());
@@ -349,7 +458,7 @@ public class TicketDAO {
 
         return ticket;
     }
-    
+
     public Ticket resolveTicket(Ticket ticket) {
         Connection conn = null;
         PreparedStatement prepared = null;
@@ -571,10 +680,9 @@ public class TicketDAO {
         return null;
 
     }
-    
+
     //tickets vencidos
-    
-     public List<Ticket> ticketsVencidos() {        
+    public List<Ticket> ticketsVencidos() {
         Connection conn = null;
         List<Ticket> list = null;
         PreparedStatement prepared = null;
@@ -638,8 +746,8 @@ public class TicketDAO {
 
         return null;
     }
-     
-     public List<Ticket> ticketsAVencer() {        
+
+    public List<Ticket> ticketsAVencer() {
         Connection conn = null;
         List<Ticket> list = null;
         PreparedStatement prepared = null;
@@ -702,6 +810,5 @@ public class TicketDAO {
 
         return null;
     }
-     
 
 }

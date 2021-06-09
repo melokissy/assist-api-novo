@@ -102,6 +102,40 @@ public class TicketController {
 
         return tickets;
     }
+    
+    public List<Ticket> ticketsByProject() {
+        List<Ticket> tickets = this.tDAO.ticketsByProject();
+        if (!tickets.isEmpty()) {
+            for (int i = 0; i < tickets.size(); i++) {
+                if (tickets.get(i).getRequester().getId() != null) {
+                    try {
+                        User usuario = userController.getUserById(tickets.get(i).getRequester().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setRequester(usuario);
+                    } catch (Exception e) {
+                        System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
+                    }
+
+                }
+                try {
+                    if (tickets.get(i).getResponsible().getId() > 0) {
+                        User usuario = userController.getUserById(tickets.get(i).getResponsible().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setResponsible(usuario);
+                    } else if (tickets.get(i).getResponsible().getId() == 0 || tickets.get(i).getResponsible().getId() == null) {
+                        User usuario = new User();
+                        tickets.get(i).setResponsible(usuario);
+                    }
+                } catch (Exception e) {
+                    System.out.println("[ TICKET CONTROLLER - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
+
+                }
+
+            }
+        }
+
+        return tickets;
+    }
 
     public Ticket search(Integer id) throws Exception {
         try {
@@ -115,6 +149,18 @@ public class TicketController {
             throw new Exception("Não foi possível localizar o ticket");
         }
     }
+    
+        public int countTicketByProject(Integer idProject) throws Exception {
+        try {
+            int contador = tDAO.countTicketsByProject(idProject);
+            System.out.println("QTD NO CONTROLLER TICKET: " +contador);
+            return contador;
+            
+        } catch (Exception e) {
+            throw new Exception("Não foi possível localizar o ticket");
+        }
+    }
+
 
     public List<Ticket> ticketsVencidos() {
         List<Ticket> tickets = this.tDAO.ticketsVencidos();
@@ -225,7 +271,7 @@ public class TicketController {
 
         return contadorTickets;
     }
-
+    
     public LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
         return Instant.ofEpochMilli(dateToConvert.getTime())
                 .atZone(ZoneId.systemDefault())
