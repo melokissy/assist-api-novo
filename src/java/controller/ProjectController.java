@@ -84,6 +84,11 @@ public class ProjectController {
     }
 
     public Project delete(Integer idProject) {
+
+        // incluir aqui a validação de ver se tem ticket atrelado ao projeto 
+        // se tiver não pode excluir
+        
+        // criar o search por id de project no ticket
         Project selectProject = this.projectDao.search(idProject);
         return this.projectDao.delete(selectProject);
     }
