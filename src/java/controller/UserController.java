@@ -47,10 +47,7 @@ public class UserController {
         
     public User insert(User user) throws Exception {
         try {
-            
-            if (!validaCpf.isValidCPF(user.getCpf())){
-                return null;                    
-            }
+           
             
             User userExist = getUserByCpf(user); 
             

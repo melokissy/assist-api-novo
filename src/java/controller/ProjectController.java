@@ -31,8 +31,8 @@ public class ProjectController {
     public Project search(Integer id) throws Exception {
         try {
             Project project = projectDao.search(id);
-            if(project == null){
-               return project;
+            if (project == null) {
+                return project;
             }
             User userResponsible = userController.getUserById(project.getResponsible().getId());
             project.setResponsible(userResponsible);
@@ -52,6 +52,7 @@ public class ProjectController {
                 project.setNumber("PROJECT-" + "0" + contador);
             }
             projectDao.insertProject(project);
+
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar projeto");
         }
@@ -68,10 +69,10 @@ public class ProjectController {
             if (project.getName() != null) {
                 selectedProject.setName(project.getName());
             }
-            if (project.getStatus()!= null) {
+            if (project.getStatus() != null) {
                 selectedProject.setStatus(project.getStatus());
             }
-            if (project.getDescription()!= null) {
+            if (project.getDescription() != null) {
                 selectedProject.setDescription(project.getDescription());
             }
             projectDao.update(selectedProject);

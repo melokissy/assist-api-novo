@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.Project;
 import model.Ticket;
+import model.User;
 
 /**
  *
@@ -56,17 +57,16 @@ public class ProjectResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response search(@PathParam("id") String id) throws Exception {
         Project project = this.projectController.search(Integer.parseInt(id));
-        if(project != null){
-             return Response
-                .ok(Response.Status.FOUND)
-                .entity(project)
-                .build();            
+        if (project != null) {
+            return Response
+                    .ok(Response.Status.FOUND)
+                    .entity(project)
+                    .build();
         }
-         return Response
+        return Response
                 .status(Response.Status.NOT_FOUND)
-                 .entity(null)
+                .entity(null)
                 .build();
-       
     }
 
     @POST
@@ -74,10 +74,17 @@ public class ProjectResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response insert(Project project) throws Exception {
         project = this.projectController.insert(project);
+
+        if (project.getResponsible().getStatus() == false) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Usuário desativado não pode ser responsável por projeto!")
+                    .build();
+        }
         return Response
                 .ok(Response.Status.CREATED)
                 .entity(project)
                 .build();
+
     }
 
     @PUT
