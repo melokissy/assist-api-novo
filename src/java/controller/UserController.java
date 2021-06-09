@@ -49,7 +49,7 @@ public class UserController {
         try {
             
             if (!validaCpf.isValidCPF(user.getCpf())){
-                return null;                     
+                return null;                    
             }
             
             User userExist = getUserByCpf(user); 

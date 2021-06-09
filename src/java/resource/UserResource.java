@@ -6,6 +6,7 @@
 package resource;
 
 import controller.UserController;
+import helpers.ValidaCpf;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.annotation.security.RunAs;
@@ -31,10 +32,12 @@ import model.User;
  */
 @Path("users")
 public class UserResource {
+
     @Context
     private UriInfo context;
 
     private final UserController userController;
+    private final ValidaCpf validaCpf = new ValidaCpf();
 
     /**
      * Creates a new instance of GenericResource
@@ -42,68 +45,79 @@ public class UserResource {
     public UserResource() {
         this.userController = new UserController();
     }
-    
+
 //    @RolesAllowed({"administrador"})
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response index() throws Exception {
         List<User> users = this.userController.users();
-        GenericEntity<List<User>> list = new GenericEntity<List<User>>(users) {};
+        GenericEntity<List<User>> list = new GenericEntity<List<User>>(users) {
+        };
         return Response
                 .ok()
                 .entity(list)
                 .build();
     }
-    
+
 //    @RolesAllowed({"administrador"})
     @GET
     @Path("/by-profile")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response usersByProfile() throws Exception {
         List<User> users = this.userController.usersByProfile();
-        GenericEntity<List<User>> list = new GenericEntity<List<User>>(users) {};
+        GenericEntity<List<User>> list = new GenericEntity<List<User>>(users) {
+        };
         return Response
                 .ok()
                 .entity(list)
                 .build();
-    } 
-    
+    }
+
 //    @RolesAllowed({"administrador"})
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response userById(@PathParam("id") int id) throws Exception {
         User user = this.userController.getUserById(id);
-        GenericEntity<User> list = new GenericEntity<User>(user) {};
+        GenericEntity<User> list = new GenericEntity<User>(user) {
+        };
         return Response
                 .ok()
                 .entity(list)
                 .build();
-    }  
+    }
 
 //    @RolesAllowed({"administrador"})
     @POST
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response insert(User user) throws Exception {
-        user = this.userController.insert(user);
-        if (user != null) {
-            return Response
-                .ok(Response.Status.CREATED)
-                .entity(user)
-                .build();
+
+        if (!validaCpf.isValidCPF(user.getCpf())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("CPF inválido")
+                    .build();
         }
-            return Response
-                .status(Response.Status.BAD_REQUEST)
+        if (userController.getUserByCpf(user) != null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Já existe cadastro para esse CPF")
+                    .build();
+        }
+
+        user = this.userController.insert(user);
+        return Response
+                .ok(Response.Status.CREATED)
+                .entity("Usuário cadastrado com sucesso!")
                 .build();
-    }  
-    
+
+    }
+
 //    @RolesAllowed({"administrador"})
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response update(@PathParam("id")  String id, User user) {
+    public Response update(@PathParam("id") String id, User user) {
         user.setId(Integer.parseInt(id));
         user = this.userController.update(user);
         return Response
@@ -111,15 +125,15 @@ public class UserResource {
                 .entity(user)
                 .build();
     }
-    
+
 //    @RolesAllowed({"administrador"})
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response delete(@PathParam("id")  String id, User user) {
+    public Response delete(@PathParam("id") String id, User user) {
         Integer idUser = 0;
-          idUser = Integer.parseInt(id);
+        idUser = Integer.parseInt(id);
 //        user.setId(Integer.parseInt(id));
         user = this.userController.delete(idUser);
         return Response
