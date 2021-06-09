@@ -86,11 +86,15 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response insert(User user) throws Exception {
-        System.out.println("CHEGANDO AQUI");
         user = this.userController.insert(user);
-          return Response
+        if (user != null) {
+            return Response
                 .ok(Response.Status.CREATED)
                 .entity(user)
+                .build();
+        }
+            return Response
+                .status(Response.Status.BAD_REQUEST)
                 .build();
     }  
     

@@ -9,6 +9,7 @@ import Autenticacao.JWTTokenUtils;
 import DTO.UserDTO;
 import dao.TokenDAO;
 import dao.UserDAO;
+import helpers.ValidaCpf;
 import java.util.List;
 import model.Token;
 import model.User;
@@ -21,13 +22,14 @@ public class UserController {
 
     private final UserDAO userDao = new UserDAO();
     private final TokenDAO tokenDAO = new TokenDAO(); 
+    private final ValidaCpf validaCpf = new ValidaCpf();
 
     public User getUserById(Integer idUser) {
         return this.userDao.search(idUser);
     }
 
-    public User getUserByName(User user) {
-        return this.userDao.searchByName(user.getCpf());
+    public User getUserByCpf(User user) {
+        return this.userDao.searchByCpf(user.getCpf());
     }
     
       public UserDTO login(User user) {        
@@ -45,9 +47,21 @@ public class UserController {
         
     public User insert(User user) throws Exception {
         try {
-            user.setStatus(true);
-            user.setPassword("123");
-            userDao.insertUser(user);
+            
+            if (!validaCpf.isValidCPF(user.getCpf())){
+                return null;                     
+            }
+            
+            User userExist = getUserByCpf(user); 
+            
+            if(userExist == null){
+                user.setStatus(true);
+                user.setPassword("123");
+                userDao.insertUser(user);                
+            }else{
+                return null;                      
+            }           
+
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar usuário");
         }

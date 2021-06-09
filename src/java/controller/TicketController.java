@@ -41,7 +41,7 @@ public class TicketController {
             User userRequester = new User();
             User newUser = new User();
             user = ticket.getRequester(); 
-            userRequester = userController.getUserByName(user); 
+            userRequester = userController.getUserByCpf(user); 
             
             if (userRequester != null && userRequester.getCpf().equals(user.getCpf())) {
                 ticket.getRequester().setId(userRequester.getId());

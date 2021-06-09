@@ -289,7 +289,7 @@ public class UserDAO {
         return user;
     }
 
-    public User searchByName(String cpf) {
+    public User searchByCpf(String cpf) {
         Connection conn = null;
         PreparedStatement prepared = null;
         ResultSet rs = null;
