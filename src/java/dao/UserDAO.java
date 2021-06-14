@@ -18,6 +18,7 @@ public class UserDAO {
     private static final String EDIT_USER = "UPDATE user SET name = ?, email = ?, password = ?, status = ?, userIcon = ?, profile = ?, cpf=?, setor=? WHERE idUser = ?";
     private static final String SEARCH = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE idUser=?";
     private static final String SEARCH_BY_CPF = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE cpf=?";
+    private static final String SEARCH_BY_EMAIL = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE email=?";
     private static final String LOGIN = "SELECT name, email, profile,idUser FROM user WHERE email=? and password=?";
 
     private static final String DELETE_USER = "DELETE FROM user WHERE idUser=?";
@@ -314,6 +315,53 @@ public class UserDAO {
 
         } catch (Exception ex) {
             System.out.println("[SEARCH USER BY NAME] - " + ex.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+
+                if (prepared != null) {
+                    prepared.close();
+                }
+
+                if (rs != null) {
+                    rs.close();
+                }
+
+            } catch (Exception ex) {
+                System.out.println("Error Close connections " + ex.getMessage());
+            }
+        }
+        return null;
+
+    }
+    
+    public User searchByEmail(String email) {
+        Connection conn = null;
+        PreparedStatement prepared = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(SEARCH_BY_EMAIL);
+            prepared.setString(1, email);
+            rs = prepared.executeQuery();
+
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt(1));
+                user.setName(rs.getString(2));
+                user.setEmail(rs.getString(3));
+                user.setStatus(rs.getBoolean(4));
+                user.setProfile(rs.getString(5));
+                user.setCpf(rs.getString(6));
+                user.setSetor(rs.getString(7));
+                return user;
+            }
+
+        } catch (Exception ex) {
+            System.out.println("[SEARCH USER BY EMAIL] - " + ex.getMessage());
         } finally {
             try {
                 if (conn != null) {

@@ -102,7 +102,7 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response insert(Ticket ticket) throws Exception {
         
-        //COLCOAR AQUI UMA VALIDAÇÃO PARA O CASO DO SOLICITANTE ESTAR DESATIVADO, NAO PODE CAASTRAR
+        //COLCOAR AQUI UMA VALIDAÇÃO PARA O CASO DO SOLICITANTE ESTAR DESATIVADO, NAO PODE CADASTRAR
         ticket = this.ticketController.insert(ticket);
         return Response
                 .ok(Response.Status.CREATED)

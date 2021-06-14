@@ -32,6 +32,10 @@ public class UserController {
         return this.userDao.searchByCpf(user.getCpf());
     }
     
+    public User getUserByEmail(User user) {
+        return this.userDao.searchByEmail(user.getEmail());
+    }
+    
       public UserDTO login(User user) {        
         user = this.userDao.login(user);
         if(user != null){
@@ -46,16 +50,21 @@ public class UserController {
     }
         
     public User insert(User user) throws Exception {
-        try {
-           
-            
-            User userExist = getUserByCpf(user); 
+        try {            
+            User userExist = getUserByCpf(user);
+            User user2 = getUserByEmail(user);
             
             if(userExist == null){
                 user.setStatus(true);
                 user.setPassword("123");
                 userDao.insertUser(user);                
-            }else{
+            }
+            if (user2 == null){ //valida email
+                user.setStatus(true);
+                user.setPassword("123");
+                userDao.insertUser(user);                 
+            }
+            else{
                 return null;                      
             }           
 

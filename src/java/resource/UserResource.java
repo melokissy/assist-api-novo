@@ -102,6 +102,11 @@ public class UserResource {
                     .entity("Já existe cadastro para esse CPF")
                     .build();
         }
+        if (userController.getUserByEmail(user) != null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Já existe cadastro para esse email")
+                    .build();
+        }
 
         user = this.userController.insert(user);
         return Response
