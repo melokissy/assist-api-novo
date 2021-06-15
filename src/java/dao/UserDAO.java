@@ -14,7 +14,7 @@ public class UserDAO {
     private static final String NEW_USER = "INSERT INTO user ( name , password, email, status, userIcon, profile,cpf,setor) VALUES (?,?,?,?,?,?,?,?)";
     private static final String SEARCH_BY_ID = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE idUser=?";
     private static final String USERS = "SELECT idUser, name, email, status, profile,cpf,setor FROM user ORDER BY UPPER(name) ASC";
-    private static final String USERS_BY_PROFILE = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE profile = 'Tecnico' ORDER BY UPPER(name) ASC";
+    private static final String USERS_BY_PROFILE = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE profile in ('Tecnico','Administrador') and status = '1' ORDER BY UPPER(name) ASC";
     private static final String EDIT_USER = "UPDATE user SET name = ?, email = ?, password = ?, status = ?, userIcon = ?, profile = ?, cpf=?, setor=? WHERE idUser = ?";
     private static final String SEARCH = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE idUser=?";
     private static final String SEARCH_BY_CPF = "SELECT idUser, name, email, status, profile,cpf,setor FROM user WHERE cpf=?";

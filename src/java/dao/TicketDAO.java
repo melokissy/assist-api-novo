@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import model.Comment;
@@ -25,7 +26,7 @@ public class TicketDAO {
 
     private static final String NEW_TICKET = "INSERT INTO ticket (subject, description, requester_id, type, priority, status, project_id, createdAt,dueDate,number) VALUES (?,?,?,?,?,?,?,?,?,?)";
     //private static final String SEARCH_BY_ID = "SELECT idTicket, subject, description, requester_id, type, priority,status,project_id,responsible_id, createdAt, editedAt,dueDate FROM ticket WHERE idTicket=?";
-    private static final String EDIT_TICKET = "UPDATE ticket SET subject = ?, description = ?, requester_id = ?, type = ?, priority = ?, status = ?, project_id = ?, responsible_id = ?, editedAt = ?, dueDate=? WHERE idTicket = ?";
+    private static final String EDIT_TICKET = "UPDATE ticket SET subject = ?, description = ?, requester_id = ?, type = ?, priority = ?, status = ?, project_id = ?, responsible_id = ?, editedAt = ? WHERE idTicket = ?";
     private static final String RESOLVE = "UPDATE ticket SET status = ?, closedAt=? WHERE idTicket = ?";
     private static final String SEARCH = "SELECT idTicket, subject , description, requester_id, type, priority, status, project_id, responsible_id, createdAt, editedAt,dueDate, closedAt, number FROM ticket WHERE idTicket=?";
     private static final String DELETE_TICKET = "DELETE FROM ticket WHERE idTicket=?";
@@ -81,7 +82,6 @@ public class TicketDAO {
     private static final String COUNT = "select count(*) from ticket";
     private static final String COUNT_BY_PROJECT = "select count(*) from ticket where project_id = ?";
     private static final String COUNT_BY_REQUESTER = "select count(*) from ticket where requester_id = ?";
-    private static final String TICKET_COMMENTS = "SELECT idComment, user_id, createdAt, comment FROM comment where idComment=?";
     private static final String TICKET_BY_PROJECT = "SELECT idTicket, subject , description, requester_id, type, priority, status, project_id, responsible_id, "
             + "createdAt, editedAt,dueDate, closedAt, number FROM ticket WHERE project_id = ?";
 
@@ -327,7 +327,7 @@ public class TicketDAO {
         }
         return null;
     }
-    
+
     // conta tickets pelo projecr
     public Integer countTicketsByProject(int idProject) {
         Connection conn = null;
@@ -429,14 +429,14 @@ public class TicketDAO {
             prepared = conn.prepareStatement(EDIT_TICKET);
             prepared.setString(1, ticket.getSubject());
             prepared.setString(2, ticket.getDescription());
-            prepared.setString(3, ticket.getRequester().getName());
+            prepared.setInt(3, ticket.getRequester().getId());
             prepared.setString(4, ticket.getType());
             prepared.setString(5, ticket.getPriority());
-            prepared.setInt(6, ticket.getId());
-            prepared.setString(7, ticket.getStatus());
-            prepared.setInt(8, ticket.getProject().getId());
-            prepared.setString(9, ticket.getResponsible().getName());
-            prepared.setDate(10, java.sql.Date.valueOf(java.time.LocalDate.now()));
+            prepared.setString(6, ticket.getStatus());
+            prepared.setInt(7, ticket.getProject().getId());
+            prepared.setInt(8, ticket.getResponsible().getId());
+             prepared.setTimestamp(9, (Timestamp) ticket.getEditedAt());
+            prepared.setInt(10, ticket.getId());
 //            prepared.setString(11, ticket.getDueDate());
             prepared.executeUpdate();
             return ticket;
@@ -811,5 +811,5 @@ public class TicketDAO {
 
         return null;
     }
-    
+
 }

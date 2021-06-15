@@ -28,6 +28,7 @@ public class Ticket {
     private Date closedAt; 
     private Date dueDate;
     private List<Comment> comment; 
+    private List<Historic> historic;
 //    private Date estimativa;
             
     public Ticket(){};
@@ -49,7 +50,7 @@ public class Ticket {
         this.dueDate = dueDate;
     }
 
-    public Ticket(int id, String number, String subject, String description, User requester, String type, String priority, String status, Project project, User responsible, Date createdAt, Date editedAt, Date closedAt, Date dueDate, List<Comment> comment) {
+    public Ticket(int id, String number, String subject, String description, User requester, String type, String priority, String status, Project project, User responsible, Date createdAt, Date editedAt, Date closedAt, Date dueDate, List<Comment> comment, List<Historic> historic) {
         this.id = id;
         this.number = number;
         this.subject = subject;
@@ -65,6 +66,7 @@ public class Ticket {
         this.closedAt = closedAt;
         this.dueDate = dueDate;
         this.comment = comment;
+        this.historic = historic;
     }
 
     public int getId() {
@@ -186,6 +188,14 @@ public class Ticket {
     public void setComment(List<Comment> comment) {
         this.comment = comment;
     }
-    
+
+    public List<Historic> getHistoric() {
+        return historic;
+    }
+
+    public void setHistoric(List<Historic> historic) {
+        this.historic = historic;
+    }
+      
     
 }

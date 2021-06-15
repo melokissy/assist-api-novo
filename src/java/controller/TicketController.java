@@ -6,10 +6,13 @@
 package controller;
 
 import dao.TicketDAO;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import model.Comment;
 import model.Counter;
+import model.Historic;
 import model.Ticket;
 import model.User;
 
@@ -30,14 +34,14 @@ public class TicketController {
 
     private final TicketDAO tDAO = new TicketDAO();
     UserController userController = new UserController();
-    CommentController commentController = new CommentController(); 
-    
-    private String status = "Resolvido";  
+    CommentController commentController = new CommentController();
+    HistoricController historicController = new HistoricController();
 
+    private String status = "Resolvido";
 
     public Ticket insert(Ticket ticket) throws Exception {
         try {
-           
+
             int contador = tDAO.countTickets() + 1;
             if (contador < 100) {
                 ticket.setNumber("TICKET-" + "00" + contador);
@@ -45,8 +49,9 @@ public class TicketController {
             if (contador > 100) {
                 ticket.setNumber("TICKET-" + "0" + contador);
             }
-                        
+
             tDAO.insertTicket(ticket);
+            saveHistoric("Ticket criado", ticket);
 
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar ticket");
@@ -87,7 +92,7 @@ public class TicketController {
 
         return tickets;
     }
-    
+
     public List<Ticket> ticketsByProject() {
         List<Ticket> tickets = this.tDAO.ticketsByProject();
         if (!tickets.isEmpty()) {
@@ -126,21 +131,27 @@ public class TicketController {
         try {
             Ticket ticket = tDAO.search(id);
             List<Comment> comments = commentController.searchCommentsByTicket(id);
+            List<Historic> historic = historicController.searchHistoricByTicket(id);
+
             if (!comments.isEmpty()) {
                 ticket.setComment(comments);
             }
+            if (!historic.isEmpty()) {
+                ticket.setHistoric(historic);
+            }
             return ticket;
+
         } catch (Exception e) {
             throw new Exception("Não foi possível localizar o ticket");
         }
     }
-    
+
     public int countTicketByProject(Integer idProject) throws Exception {
         try {
             int contador = tDAO.countTicketsByProject(idProject);
-            System.out.println("QTD NO CONTROLLER TICKET: " +contador);
+            System.out.println("QTD NO CONTROLLER TICKET: " + contador);
             return contador;
-            
+
         } catch (Exception e) {
             throw new Exception("Não foi possível localizar o ticket");
         }
@@ -180,7 +191,23 @@ public class TicketController {
         return tickets;
     }
 
-    public Ticket update(Ticket ticket) {
+    public void saveHistoric(String description, Ticket ticket) throws Exception {
+        Historic historic = new Historic();
+
+        historic.setDescription(description);
+        historic.setTicket_description(ticket.getDescription());
+        historic.setPriority(ticket.getPriority());
+        historic.setSubject(ticket.getSubject());
+        historic.setType(ticket.getType());
+        historic.setResponsible_id(ticket.getResponsible().getId());
+        historic.setTicket_id(ticket.getId());
+        historic.setStatus(ticket.getStatus());
+        historic.setCreatedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+        historicController.insert(historic);
+    }
+
+    public Ticket update(Ticket ticket) throws Exception {
+
         Ticket selectedTicket = this.tDAO.search(ticket.getId());
 
         if (ticket.getSubject() != null) {
@@ -203,8 +230,15 @@ public class TicketController {
             selectedTicket.setType(ticket.getType());
         }
 
-        //colocar data editat
-        return this.tDAO.update(selectedTicket);
+        if (ticket.getStatus() != null) {
+            selectedTicket.setStatus(ticket.getStatus());
+        }
+
+        selectedTicket.setEditedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+        Ticket response = this.tDAO.update(selectedTicket);
+        saveHistoric("Ticket atualizado", selectedTicket);
+        return response;
+
     }
 
     public Ticket resolveTicket(String id) throws Exception {
@@ -255,7 +289,7 @@ public class TicketController {
 
         return contadorTickets;
     }
-    
+
     public LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
         return Instant.ofEpochMilli(dateToConvert.getTime())
                 .atZone(ZoneId.systemDefault())

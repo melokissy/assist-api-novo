@@ -114,7 +114,7 @@ public class TicketResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response update(@PathParam("id") String id, Ticket ticket) {
+    public Response update(@PathParam("id") String id, Ticket ticket) throws Exception {
         ticket.setId(Integer.parseInt(id));
         ticket = this.ticketController.update(ticket);
         return Response
