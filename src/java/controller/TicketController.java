@@ -201,7 +201,7 @@ public class TicketController {
         historic.setSubject(ticket.getSubject());
         historic.setType(ticket.getType());
         if ( ticket.getResponsible() != null ){
-            historic.setResponsible_id(ticket.getResponsible().getId());
+            historic.setTicket_responsible(ticket.getResponsible());
         }        
         historic.setTicket_id(ticket.getId());
         historic.setStatus(ticket.getStatus());

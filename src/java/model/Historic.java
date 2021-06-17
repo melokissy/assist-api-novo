@@ -14,7 +14,7 @@ import java.util.Date;
 public class Historic {
     private Integer id; 
     private int ticket_id;
-    private int user_id; 
+    private User user; 
     private String description; 
     private Date createdAt; 
     private String status; 
@@ -22,7 +22,7 @@ public class Historic {
     private String ticket_description;
     private String priority;
     private String type;
-    private int responsible_id;
+    private User ticket_responsible;
     
     public Historic(){};
 
@@ -66,14 +66,6 @@ public class Historic {
         this.status = status;
     }
 
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
-    }
-
     public String getSubject() {
         return subject;
     }
@@ -106,13 +98,21 @@ public class Historic {
         this.type = type;
     }
 
-    public int getResponsible_id() {
-        return responsible_id;
+    public User getUser() {
+        return user;
     }
 
-    public void setResponsible_id(int responsible_id) {
-        this.responsible_id = responsible_id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    
+    public User getTicket_responsible() {
+        return ticket_responsible;
+    }
+
+    public void setTicket_responsible(User ticket_responsible) {
+        this.ticket_responsible = ticket_responsible;
+    }
+
+       
 }

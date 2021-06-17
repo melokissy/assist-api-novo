@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Comment;
 import model.Historic;
+import model.User;
 
 /**
  *
@@ -30,21 +31,26 @@ public class HistoricController {
         try {
             List<Historic> historicos = historicDAO.listHistoricByTicketId(id);
 
-            historicos.forEach(historic -> {
-
-                Date dataAtual = historic.getCreatedAt();
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                String dataFormatada = dateFormat.format(dataAtual);
-
-                try {
-                    historic.setCreatedAt(
-                            new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataFormatada)
-                    );
-                } catch (ParseException ex) {
-                    Logger.getLogger(CommentController.class.getName()).log(Level.SEVERE, null, ex);
+            if (!historicos.isEmpty()) {
+                for (int i = 0; i < historicos.size(); i++) {
+                    if (historicos.get(i).getUser().getId() != null) {
+                        try {
+                            User usuario = userController.getUserById(historicos.get(i).getUser().getId());
+                            historicos.get(i).setUser(usuario);
+                        } catch (Exception e) {
+                            System.out.println("[NAO LOCALIZOU O USUARIO HISTORICO] - " + e.getMessage());
+                        }
+                    }
+                    if (historicos.get(i).getTicket_responsible().getId() != null) {
+                        try {
+                            User usuario = userController.getUserById(historicos.get(i).getTicket_responsible().getId());
+                            historicos.get(i).setTicket_responsible(usuario);
+                        } catch (Exception e) {
+                            System.out.println("[NAO LOCALIZOU O USUARIO SOLICITANTE HISTORICO] - " + e.getMessage());
+                        }
+                    }
                 }
-
-            });
+            }
             return historicos;
             
         } catch (Exception e) {

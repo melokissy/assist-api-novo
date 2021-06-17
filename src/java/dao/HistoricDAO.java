@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Comment;
 import model.Historic;
+import model.User;
 
 /**
  *
@@ -48,13 +49,21 @@ public class HistoricDAO {
                 Historic historic = new Historic();
                 historic.setId(rs.getInt(1));
                 historic.setTicket_id(rs.getInt(2));
-                historic.setUser_id(rs.getInt(3));
+                
+                User user = new User();
+                user.setId(rs.getInt(3));
+                historic.setUser(user);
+
                 historic.setDescription(rs.getString(4));
                 historic.setCreatedAt(rs.getDate(5));
                 historic.setStatus(rs.getString(6));
                 historic.setSubject(rs.getString(7));
                 historic.setTicket_description(rs.getString(8));
-                historic.setResponsible_id(rs.getInt(9));
+                
+                User userResponsible = new User();
+                userResponsible.setId(rs.getInt(9));
+                historic.setTicket_responsible(userResponsible);
+                                
                 historic.setPriority(rs.getString(10));
                 historic.setType(rs.getString(11));
                 list.add(historic);
@@ -91,13 +100,13 @@ public class HistoricDAO {
             conn = new ConnectionFactory().getConnection();
             prepared = conn.prepareStatement(NEW_HISTORIC, Statement.RETURN_GENERATED_KEYS);
             prepared.setInt(1, historic.getTicket_id());
-            prepared.setInt(2, historic.getUser_id());
+            prepared.setInt(2, historic.getUser().getId());
             prepared.setString(3, historic.getDescription());
             prepared.setTimestamp(4, (Timestamp) historic.getCreatedAt());
             prepared.setString(5, historic.getStatus());
             prepared.setString(6, historic.getSubject());
             prepared.setString(7, historic.getTicket_description());
-            prepared.setInt(8, historic.getResponsible_id());
+            prepared.setInt(8, historic.getTicket_responsible().getId());
             prepared.setString(9, historic.getPriority());
             prepared.setString(10, historic.getType());               
 
