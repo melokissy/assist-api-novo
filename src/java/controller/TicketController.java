@@ -49,7 +49,8 @@ public class TicketController {
             if (contador > 100) {
                 ticket.setNumber("TICKET-" + "0" + contador);
             }
-
+            
+            ticket.setStatus("Pendente");
             tDAO.insertTicket(ticket);
             saveHistoric("Ticket criado", ticket);
 
@@ -199,7 +200,9 @@ public class TicketController {
         historic.setPriority(ticket.getPriority());
         historic.setSubject(ticket.getSubject());
         historic.setType(ticket.getType());
-        historic.setResponsible_id(ticket.getResponsible().getId());
+        if ( ticket.getResponsible() != null ){
+            historic.setResponsible_id(ticket.getResponsible().getId());
+        }        
         historic.setTicket_id(ticket.getId());
         historic.setStatus(ticket.getStatus());
         historic.setCreatedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Comment;
+import model.User;
 import sun.text.resources.FormatData;
 
 /**
@@ -29,23 +30,21 @@ public class CommentController {
         try {
             List<Comment> comentarios = commentDAO.listCommentsByTicketId(id);
 
-            comentarios.forEach(comment -> {
+            if (!comentarios.isEmpty()) {
+                for (int i = 0; i < comentarios.size(); i++) {
+                    if (comentarios.get(i).getUser().getId() != null) {
+                        try {
+                            User usuario = userController.getUserById(comentarios.get(i).getUser().getId());
+                            comentarios.get(i).setUser(usuario);
+                        } catch (Exception e) {
+                            System.out.println("[NAO LOCALIZOU O USUARIO COMMENT] - " + e.getMessage());
+                        }
 
-                Date dataAtual = comment.getCreatedAt();
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                String dataFormatada = dateFormat.format(dataAtual);
-
-                try {
-                    comment.setCreatedAt(
-                            new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dataFormatada)
-                    );
-                } catch (ParseException ex) {
-                    Logger.getLogger(CommentController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-
-                comment.setUser(this.userController.getUserById(comment.getUser().getId()));
-            });
+            }
             return comentarios;
+            
         } catch (Exception e) {
             throw new Exception("Não foi possível localizar o projeto");
         }
