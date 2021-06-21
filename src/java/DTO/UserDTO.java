@@ -5,21 +5,20 @@
  */
 package DTO;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Kissy de Melo
  */
 public class UserDTO{
     
-    private String email; 
+    private String email;
+    private Integer idUser;
     private String profile; 
     private String token;
     private String name;
     private int id; 
     
-    public UserDTO(){};
+    public UserDTO(){};     
 
     public UserDTO(String email, String profile, String token, String name, int id) {
         this.email = email;
@@ -29,7 +28,14 @@ public class UserDTO{
         this.id = id;
     }
 
-    
+    public UserDTO(String email, Integer idUser, String profile, String token, String name, int id) {
+        this.email = email;
+        this.idUser = idUser;
+        this.profile = profile;
+        this.token = token;
+        this.name = name;
+        this.id = id;
+    }
     
     public int getId() {
         return id;
@@ -37,6 +43,14 @@ public class UserDTO{
 
     public void setId(int id) {
         this.id = id;
+    }
+    
+    public Integer getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Integer idUser) {
+        this.idUser = idUser;
     }
 
     public String getEmail() {

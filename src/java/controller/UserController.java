@@ -43,7 +43,7 @@ public class UserController {
                      
             Token token1 = tokenDAO.insertToken(token, user.getId());
             
-            UserDTO userDTO = new UserDTO(user.getEmail(),user.getProfile(),token,user.getName(), user.getId());
+            UserDTO userDTO = new UserDTO(user.getEmail(),user.getId() ,user.getProfile(), token, user.getName(), user.getId());
             return userDTO;
         }
         return null;
