@@ -30,6 +30,7 @@ public class CORSFilter implements ContainerResponseFilter {
         responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:4200"); //angular application
 //        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:45014");
 //        responseContext.getHeaders().add("Access-Control-Allow-Origin", "/*");
+//        responseContext.getHeaders().add("Access-Control-Allow-Headers", "/*");
         responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authoriation");
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");

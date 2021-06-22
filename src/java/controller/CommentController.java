@@ -46,7 +46,7 @@ public class CommentController {
             return comentarios;
             
         } catch (Exception e) {
-            throw new Exception("Não foi possível localizar o projeto");
+            throw new Exception("Não foi possível localizar os comentarios");
         }
     }
 
@@ -57,6 +57,14 @@ public class CommentController {
             throw new Exception("Não foi possivel cadastrar comentário!");
         }
         return comment;
+    }
+
+    public Comment delete(Integer idComment) throws Exception {
+
+        Comment selectComment = this.commentDAO.searchById(idComment);
+        selectComment = this.commentDAO.searchById(idComment);
+        return this.commentDAO.delete(selectComment);
+
     }
 
 }

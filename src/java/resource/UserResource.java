@@ -128,7 +128,7 @@ public class UserResource {
                 .entity(user)
                 .build();
     }
-
+    
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")

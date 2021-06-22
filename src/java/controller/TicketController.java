@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
 import javax.ws.rs.core.Response;
+import model.Attachment;
 import model.Comment;
 import model.Counter;
 import model.Historic;
@@ -36,6 +37,7 @@ public class TicketController {
     UserController userController = new UserController();
     CommentController commentController = new CommentController();
     HistoricController historicController = new HistoricController();
+    AttachmentController attachmentController = new AttachmentController();
 
     private String status = "Resolvido";
 
@@ -49,7 +51,7 @@ public class TicketController {
             if (contador > 100) {
                 ticket.setNumber("TICKET-" + "0" + contador);
             }
-            
+
             ticket.setStatus("Pendente");
             tDAO.insertTicket(ticket);
             saveHistoric("Ticket criado", ticket);
@@ -133,12 +135,16 @@ public class TicketController {
             Ticket ticket = tDAO.search(id);
             List<Comment> comments = commentController.searchCommentsByTicket(id);
             List<Historic> historic = historicController.searchHistoricByTicket(id);
+            List<Attachment> anexos = attachmentController.searchAnexosByTicket(id);
 
             if (!comments.isEmpty()) {
                 ticket.setComment(comments);
             }
             if (!historic.isEmpty()) {
                 ticket.setHistoric(historic);
+            }
+            if (!anexos.isEmpty()) {
+                ticket.setAnexos(anexos);
             }
             return ticket;
 
@@ -200,9 +206,9 @@ public class TicketController {
         historic.setPriority(ticket.getPriority());
         historic.setSubject(ticket.getSubject());
         historic.setType(ticket.getType());
-        if ( ticket.getResponsible() != null ){
+        if (ticket.getResponsible() != null) {
             historic.setTicket_responsible(ticket.getResponsible());
-        }        
+        }
         historic.setTicket_id(ticket.getId());
         historic.setStatus(ticket.getStatus());
         historic.setCreatedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));

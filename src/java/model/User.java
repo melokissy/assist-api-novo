@@ -19,10 +19,11 @@ public class User {
     private String profile; 
     private String cpf; 
     private String setor; 
+    private byte[] icone; 
 
     public User(){};
 
-    public User(String name, String password, String email, Boolean status, String userIcon, String profile, String cpf, String setor) {
+    public User(String name, String password, String email, Boolean status, String userIcon, String profile, String cpf, String setor, byte[] icone) {
         this.name = name;
         this.password = password;
         this.email = email;
@@ -31,7 +32,7 @@ public class User {
         this.profile = profile; 
         this.cpf = cpf;
         this.setor = setor;
-
+        this.icone = icone;
     }
 
     public Integer getId() {
@@ -104,5 +105,13 @@ public class User {
 
     public void setSetor(String setor) {
         this.setor = setor;
+    }
+
+    public byte[] getIcone() {
+        return icone;
+    }
+
+    public void setIcone(byte[] icone) {
+        this.icone = icone;
     }
 }

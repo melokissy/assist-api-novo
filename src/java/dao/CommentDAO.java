@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import model.Comment;
+import model.Project;
 import model.Ticket;
 import model.User;
 
@@ -26,7 +27,8 @@ public class CommentDAO {
     private static final String SEARCH_BY_ID = "SELECT idComment, ticket_id, comment,user_id, createdAt FROM comment WHERE ticket_id=?";
     private static final String EDIT_COMMENT = "UPDATE comment SET comment = ? WHERE idComment = ?";
     private static final String NEW_COMMENT = "INSERT INTO comment (user_id, comment, ticket_id, createdAt) VALUES (?,?,?,?)";
-    
+    private static final String DELETE_COMMENT = "DELETE * FROM comment WHERE idComment = ?";
+
     public CommentDAO() {
     }
 
@@ -81,6 +83,55 @@ public class CommentDAO {
         return null;
     }
     
+    public Comment searchById(int id) {
+        Connection conn = null;
+        PreparedStatement prepared = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(SEARCH_BY_ID);
+            prepared.setInt(1, id);
+            rs = prepared.executeQuery();
+
+            if (rs.next()) {
+                Comment comment = new Comment();
+                comment.setId(rs.getInt(1));
+                Ticket ticket = new Ticket();
+                ticket.setId(rs.getInt(2));
+                comment.setTicket(ticket);
+                comment.setComment(rs.getString(3));
+                User user = new User();
+                user.setId(rs.getInt(4));
+                comment.setUser(user);
+                comment.setCreatedAt(rs.getDate(5));
+
+                return comment;
+            }
+
+        } catch (Exception ex) {
+            System.out.println("[SEARCH COMEMNT BY ID] - " + ex.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+
+                if (prepared != null) {
+                    prepared.close();
+                }
+
+                if (rs != null) {
+                    rs.close();
+                }
+
+            } catch (Exception ex) {
+                System.out.println("Error Close connections " + ex.getMessage());
+            }
+        }
+        return null;
+    }
+    
     public void insertComment(Comment comment){
         Connection conn = null;
         PreparedStatement prepared = null;
@@ -118,5 +169,33 @@ public class CommentDAO {
             }
         }
     
+    }
+    
+     public Comment delete(Comment comment) {
+        Connection conn = null;
+        PreparedStatement prepared = null;
+
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(DELETE_COMMENT);
+            prepared.setInt(1, comment.getId());
+            prepared.executeUpdate();
+            return comment;
+            
+        } catch (Exception ex) {
+            System.out.println("[COMMENT DELETE] - " + ex.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (prepared != null) {
+                    prepared.close();
+                }
+            } catch (Exception ex) {
+                System.out.println("Error Close connections " + ex.getMessage());
+            }
+        }
+        return comment;
     }
 }
