@@ -82,8 +82,20 @@ public class TicketDAO {
     private static final String COUNT = "select count(*) from ticket";
     private static final String COUNT_BY_PROJECT = "select count(*) from ticket where project_id = ?";
     private static final String COUNT_BY_REQUESTER = "select count(*) from ticket where requester_id = ?";
-    private static final String TICKET_BY_PROJECT = "SELECT idTicket, subject , description, requester_id, type, priority, status, project_id, responsible_id, "
-            + "createdAt, editedAt,dueDate, closedAt, number FROM ticket WHERE project_id = ?";
+    private static final String SEARCH_BY_PROJECT = "SELECT distinct t.idTicket, "
+            + "t.number,"
+            + "                t.subject,  "
+            + "                t.description,  "
+            + "                t.requester_id,  "
+            + "                t.type,  "
+            + "                t.priority,  "
+            + "                t.status,  "
+            + "                t.responsible_id,  "
+            + "                t.createdAt,  "
+            + "                t.editedAt,  "
+            + "                t.closedAt,  "
+            + "                t.dueDate "
+            + "                FROM ticket t WHERE project_id = ?";
 
     public TicketDAO() {
     }
@@ -224,51 +236,51 @@ public class TicketDAO {
     }
 
     //lista tickets por IDProject
-    public List<Ticket> ticketsByProject() {
+    public List<Ticket> ticketsByProject(int idProject) {
         Connection conn = null;
-        List<Ticket> list = null;
+        List<Ticket> list =  new ArrayList<>();
         PreparedStatement prepared = null;
         ResultSet rs = null;
 
         try {
             conn = new ConnectionFactory().getConnection();
-            prepared = conn.prepareStatement(TICKET_BY_PROJECT);
+            prepared = conn.prepareStatement(SEARCH_BY_PROJECT);
 
             Project project = new Project();
-            prepared.setInt(1, project.getId());
+            prepared.setInt(1, idProject);
 
             rs = prepared.executeQuery();
 
             while (rs.next()) {
                 Ticket ticket = new Ticket();
                 ticket.setId(rs.getInt(1));
-                ticket.setSubject(rs.getString(2));
-                ticket.setDescription(rs.getString(3));
+                ticket.setNumber(rs.getString(2));
+                ticket.setSubject(rs.getString(3));
+                ticket.setDescription(rs.getString(4));
 
+                //id e nome do usuario solicitante
                 User userRequest = new User();
-                userRequest.setId(rs.getInt(4));
+                userRequest.setId(rs.getInt(5));
                 ticket.setRequester(userRequest);
 
-                ticket.setType(rs.getString(5));
-                ticket.setPriority(rs.getString(6));
-                ticket.setStatus(rs.getString(7));
+                ticket.setType(rs.getString(6));
+                ticket.setPriority(rs.getString(7));
+                ticket.setStatus(rs.getString(8));
 
-                project.setId(rs.getInt(8));
-                ticket.setProject(project);
-
+                //pega o ususario responsavel
                 User userResponsible = new User();
                 userResponsible.setId(rs.getInt(9));
                 ticket.setResponsible(userResponsible);
 
                 ticket.setCreatedAt(rs.getDate(10));
                 ticket.setEditedAt(rs.getDate(11));
-                ticket.setDueDate(rs.getDate(12));
-                ticket.setClosedAt(rs.getDate(13));
-                ticket.setNumber(rs.getString(14));
+                ticket.setClosedAt(rs.getDate(12));
+                ticket.setDueDate(rs.getDate(13));
                 list.add(ticket);
             }
 
             return list;
+            
         } catch (Exception e) {
             System.out.println("ERROR LISTA TICKETS BY PROJECT - " + e.getMessage());
         } finally {
@@ -435,7 +447,7 @@ public class TicketDAO {
             prepared.setString(6, ticket.getStatus());
             prepared.setInt(7, ticket.getProject().getId());
             prepared.setInt(8, ticket.getResponsible().getId());
-             prepared.setTimestamp(9, (Timestamp) ticket.getEditedAt());
+            prepared.setTimestamp(9, (Timestamp) ticket.getEditedAt());
             prepared.setInt(10, ticket.getId());
 //            prepared.setString(11, ticket.getDueDate());
             prepared.executeUpdate();

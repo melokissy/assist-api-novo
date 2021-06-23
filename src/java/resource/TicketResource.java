@@ -101,9 +101,8 @@ public class TicketResource {
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response insert(Ticket ticket) throws Exception {
-        
+
         //COLCOAR AQUI UMA VALIDAÇÃO PARA O CASO DO SOLICITANTE ESTIVER DESATIVADO, NAO PODE CADASTRAR
-        
         ticket = this.ticketController.insert(ticket);
         return Response
                 .ok(Response.Status.CREATED)
@@ -132,9 +131,9 @@ public class TicketResource {
         ticket = this.ticketController.resolveTicket(id);
         if (ticket != null) {
             return Response
-                .ok(Response.Status.FOUND)
-                .entity(ticket)
-                .build();
+                    .ok(Response.Status.FOUND)
+                    .entity(ticket)
+                    .build();
         }
         return Response
                 .status(Response.Status.NOT_FOUND)
@@ -153,6 +152,7 @@ public class TicketResource {
                 .build();
     }
 
+    
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")

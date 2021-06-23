@@ -29,6 +29,7 @@ public class ApplicationConfig extends Application {
         resources.add(resource.HistoricResource.class);
         resources.add(resource.LoginResource.class);
         resources.add(resource.ProjectResource.class);
+        resources.add(resource.ReportResource.class);
         resources.add(resource.TicketResource.class);
         resources.add(resource.UserResource.class);
     }
