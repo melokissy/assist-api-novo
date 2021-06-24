@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Project {
 
-    private int id;
+    private Integer id;
     private String name;
     private String number; 
     private String description;
@@ -28,7 +28,7 @@ public class Project {
     public Project() {
     }
 
-    public Project(int id, String name, String description, Boolean status, Date createdAt, Date editedAt, String number, User responsible) {
+    public Project(Integer id, String name, String description, Boolean status, Date createdAt, Date editedAt, String number, User responsible) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -39,11 +39,11 @@ public class Project {
         this.responsible = responsible;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

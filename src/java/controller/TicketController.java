@@ -6,20 +6,15 @@
 package controller;
 
 import dao.TicketDAO;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ParamConverter.Lazy;
 import model.Attachment;
 import model.Comment;
 import model.Counter;
@@ -32,18 +27,19 @@ import model.User;
  * @author Kissy de Melo
  */
 public class TicketController {
-    
+
     private final TicketDAO tDAO = new TicketDAO();
     UserController userController = new UserController();
     CommentController commentController = new CommentController();
     HistoricController historicController = new HistoricController();
     AttachmentController attachmentController = new AttachmentController();
     
+
     private String status = "Resolvido";
-    
+
     public Ticket insert(Ticket ticket) throws Exception {
         try {
-            
+
             int contador = tDAO.countTickets() + 1;
             if (contador < 100) {
                 ticket.setNumber("TICKET-" + "00" + contador);
@@ -51,17 +47,17 @@ public class TicketController {
             if (contador > 100) {
                 ticket.setNumber("TICKET-" + "0" + contador);
             }
-            
+
             ticket.setStatus("Pendente");
             tDAO.insertTicket(ticket);
             saveHistoric("Ticket criado", ticket);
-            
+
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar ticket");
         }
         return ticket;
     }
-    
+
     public List<Ticket> tickets() {
         List<Ticket> tickets = this.tDAO.tickets();
         if (!tickets.isEmpty()) {
@@ -74,7 +70,7 @@ public class TicketController {
                     } catch (Exception e) {
                         System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
                     }
-                    
+
                 }
                 try {
                     if (tickets.get(i).getResponsible().getId() > 0) {
@@ -87,17 +83,17 @@ public class TicketController {
                     }
                 } catch (Exception e) {
                     System.out.println("[ TICKET CONTROLLER - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
-                    
+
                 }
-                
+
             }
         }
-        
+
         return tickets;
     }
-    
+
     public List<Ticket> ticketByProject(Integer idProject) throws Exception {
-        
+
         List<Ticket> tickets = this.tDAO.ticketsByProject(idProject);
         if (!tickets.isEmpty()) {
             for (int i = 0; i < tickets.size(); i++) {
@@ -109,7 +105,7 @@ public class TicketController {
                     } catch (Exception e) {
                         System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
                     }
-                    
+
                 }
                 try {
                     if (tickets.get(i).getResponsible().getId() > 0) {
@@ -122,22 +118,23 @@ public class TicketController {
                     }
                 } catch (Exception e) {
                     System.out.println("[ TICKET CONTROLLER - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
-                    
+
                 }
-                
+
             }
         }
-        
+
         return tickets;
     }
-    
+
     public Ticket search(Integer id) throws Exception {
         try {
             Ticket ticket = tDAO.search(id);
             List<Comment> comments = commentController.searchCommentsByTicket(id);
             List<Historic> historic = historicController.searchHistoricByTicket(id);
             List<Attachment> anexos = attachmentController.searchAnexosByTicket(id);
-            
+
+
             if (!comments.isEmpty()) {
                 ticket.setComment(comments);
             }
@@ -148,23 +145,23 @@ public class TicketController {
                 ticket.setAnexos(anexos);
             }
             return ticket;
-            
+
         } catch (Exception e) {
             throw new Exception("Não foi possível localizar o ticket");
         }
     }
-    
+
     public int countTicketByProject(Integer idProject) throws Exception {
         try {
             int contador = tDAO.countTicketsByProject(idProject);
             System.out.println("QTD NO CONTROLLER TICKET: " + contador);
             return contador;
-            
+
         } catch (Exception e) {
             throw new Exception("Não foi possível localizar o ticket");
         }
     }
-    
+
     public List<Ticket> ticketsVencidos() {
         List<Ticket> tickets = this.tDAO.ticketsVencidos();
         if (!tickets.isEmpty()) {
@@ -177,7 +174,7 @@ public class TicketController {
                     } catch (Exception e) {
                         System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
                     }
-                    
+
                 }
                 try {
                     if (tickets.get(i).getResponsible().getId() > 0) {
@@ -190,18 +187,18 @@ public class TicketController {
                     }
                 } catch (Exception e) {
                     System.out.println("[ TICKET CONTROLLER (VENCIDOS) - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
-                    
+
                 }
-                
+
             }
         }
-        
+
         return tickets;
     }
-    
+
     public void saveHistoric(String description, Ticket ticket) throws Exception {
         Historic historic = new Historic();
-        
+
         historic.setDescription(description);
         historic.setTicket_description(ticket.getDescription());
         historic.setPriority(ticket.getPriority());
@@ -215,46 +212,46 @@ public class TicketController {
         historic.setCreatedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         historicController.insert(historic);
     }
-    
+
     public Ticket update(Ticket ticket) throws Exception {
-        
+
         Ticket selectedTicket = this.tDAO.search(ticket.getId());
-        
+
         if (ticket.getSubject() != null) {
             selectedTicket.setSubject(ticket.getSubject());
         }
-        
+
         if (ticket.getDescription() != null) {
             selectedTicket.setDescription(ticket.getDescription());
         }
-        
+
         if (ticket.getResponsible() != null) {
             selectedTicket.setResponsible(ticket.getResponsible());
         }
-        
+
         if (ticket.getPriority() != null) {
             selectedTicket.setPriority(ticket.getPriority());
         }
-        
+
         if (ticket.getType() != null) {
             selectedTicket.setType(ticket.getType());
         }
-        
+
         if (ticket.getStatus() != null) {
             selectedTicket.setStatus(ticket.getStatus());
         }
-        
+
         selectedTicket.setEditedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         Ticket response = this.tDAO.update(selectedTicket);
         saveHistoric("Ticket atualizado", selectedTicket);
         return response;
-        
+
     }
-    
+
     public Ticket resolveTicket(String id) throws Exception {
         try {
             Ticket selectedTicket = this.tDAO.search(Integer.parseInt(id));
-            
+
             if (!selectedTicket.getStatus().equals("Resolvido")) {
                 return this.tDAO.resolveTicket(selectedTicket);
             }
@@ -262,50 +259,50 @@ public class TicketController {
         } catch (Exception e) {
             throw new Exception("Ticket já se encontra resolvido");
         }
-        
+
     }
-    
+
     public Ticket delete(Integer idTicket) {
         Ticket selectedTicket = this.tDAO.search(idTicket);
         return this.tDAO.delete(selectedTicket);
     }
-    
+
     public Integer totalPendente() {
         Integer qtdPendentes = tDAO.totalPendente();
         return qtdPendentes;
     }
-    
+
     public Integer totalTickets() {
         Integer qtdTotal = tDAO.totalTickets();
         return qtdTotal;
     }
-    
+
     public Integer totalApropriados() {
         Integer qtdApropriado = tDAO.totalApropriados();
         return qtdApropriado;
     }
-    
+
     public Integer totalConcluidos() {
         Integer qtdConcluido = tDAO.totalConcluidos();
         return qtdConcluido;
     }
-    
+
     public Counter contaTickets() {
         Counter contadorTickets = new Counter();
         contadorTickets.setQtdConcluidos(this.totalConcluidos().toString());
         contadorTickets.setQtdPendentes(this.totalPendente().toString());
         contadorTickets.setQtdApropriados(this.totalApropriados().toString());
         contadorTickets.setQtdTotal(this.totalTickets().toString());
-        
+
         return contadorTickets;
     }
-    
+
     public LocalDate convertToLocalDateViaMilisecond(Date dateToConvert) {
         return Instant.ofEpochMilli(dateToConvert.getTime())
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
     }
-    
+
     public List<Ticket> ticketsAVencer() {
         List<Ticket> ticketsUnsolved = tDAO.ticketsAVencer();
         List<Ticket> ticketsAVencer = new ArrayList<>();
@@ -320,5 +317,5 @@ public class TicketController {
         }
         return ticketsAVencer;
     }
-    
+
 }

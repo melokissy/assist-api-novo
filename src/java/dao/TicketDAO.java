@@ -96,6 +96,7 @@ public class TicketDAO {
             + "                t.closedAt,  "
             + "                t.dueDate "
             + "                FROM ticket t WHERE project_id = ?";
+    private static final String APROPRIAR_TICKET = "update ticket set reponsible_id = ? where idTicket = ?";
 
     public TicketDAO() {
     }
@@ -471,7 +472,7 @@ public class TicketDAO {
 
         return ticket;
     }
-
+    
     public Ticket resolveTicket(Ticket ticket) {
         Connection conn = null;
         PreparedStatement prepared = null;

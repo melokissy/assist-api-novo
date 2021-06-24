@@ -5,8 +5,9 @@
         <group>
             <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/dao/TicketDAO.java</file>
             <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/resource/TicketResource.java</file>
-            <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/resource/ProjectResource.java</file>
-            <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/resource/ReportResource.java</file>
+            <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/resource/UserResource.java</file>
+            <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/controller/ProjectController.java</file>
+            <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/model/Project.java</file>
             <file>file:/C:/Users/kkkkk/Documents/netbeansUfprProject/assist-api-dev/src/java/controller/TicketController.java</file>
         </group>
     </open-files>

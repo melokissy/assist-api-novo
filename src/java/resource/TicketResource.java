@@ -5,6 +5,7 @@
  */
 package resource;
 
+import controller.ProjectController;
 import controller.TicketController;
 import controller.UserController;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.Counter;
+import model.Project;
 import model.Ticket;
 import model.User;
 
@@ -37,6 +39,7 @@ public class TicketResource {
     private UriInfo context;
 
     private final TicketController ticketController;
+    private final ProjectController projectController = new ProjectController();
 
     /**
      * Creates a new instance of GenericResource
@@ -146,13 +149,16 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response search(@PathParam("id") String id) throws Exception {
         Ticket ticket = this.ticketController.search(Integer.parseInt(id));
+        if (ticket.getProject().getId() != null) {
+            Project project = projectController.search(ticket.getProject().getId());
+            ticket.setProject(project);
+        }
         return Response
                 .ok(Response.Status.FOUND)
                 .entity(ticket)
                 .build();
     }
 
-    
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")

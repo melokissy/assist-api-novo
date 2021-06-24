@@ -116,6 +116,11 @@ public class UserController {
         if (user.getCpf()!= selectedUser.getCpf()){
             selectedUser.setCpf(user.getCpf());
         }    
+        
+        if (user.getSetor()!= selectedUser.getSetor()){
+            selectedUser.setSetor(user.getSetor());
+        }
+        
         return this.userDao.update(selectedUser);
     }
 

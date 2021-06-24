@@ -81,9 +81,15 @@ public class UserResource {
         User user = this.userController.getUserById(id);
         GenericEntity<User> list = new GenericEntity<User>(user) {
         };
+        if (user != null) {
+            return Response
+                    .ok(Response.Status.FOUND)
+                    .entity(user)
+                    .build();
+        }
         return Response
-                .ok()
-                .entity(list)
+                .status(Response.Status.NOT_FOUND)
+                .entity("Usuário não existe")
                 .build();
     }
 
