@@ -5,6 +5,7 @@
  */
 package resource;
 
+import controller.ReportController;
 import controller.UserController;
 import helpers.ValidaCpf;
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import model.Ticket;
 import model.User;
 
 /**
@@ -38,7 +40,7 @@ public class UserResource {
 
     private final UserController userController;
     private final ValidaCpf validaCpf = new ValidaCpf();
-    private final ReportResource reportResource = new ReportResource();
+    private final ReportController reportController = new ReportController();
 
     /**
      * Creates a new instance of GenericResource
@@ -117,8 +119,8 @@ public class UserResource {
 
         user = this.userController.insert(user);
         return Response
-                .ok(Response.Status.CREATED)
-                .entity("Usuário cadastrado com sucesso!")
+                .ok()
+                .entity(user)
                 .build();
     }
 
@@ -135,22 +137,24 @@ public class UserResource {
                 .entity(user)
                 .build();
     }
-    
+
     @DELETE
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response delete(@PathParam("id") String id, User user) {
+    public Response delete(@PathParam("id") String id, User user) throws Exception {
         Integer idUser = 0;
-        idUser = Integer.parseInt(id);                
-        user = this.userController.delete(idUser);
-        
-        if( user == null ){
+        idUser = Integer.parseInt(id);
+
+        List<Ticket> ticketsByResponsible = this.reportController.ticketByResponsible(idUser);
+
+        if (ticketsByResponsible.size() > 0) {
             return Response.status(Response.Status.BAD_REQUEST)
-                .entity("Não é possível excluir usuário")
-                .build();
+                    .entity("Não é possível excluir usuários responsáveis por tickets")
+                    .build();
         }
-        
+
+        user = this.userController.delete(idUser);
         return Response
                 .ok()
                 .entity(user)

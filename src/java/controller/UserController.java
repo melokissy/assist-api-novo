@@ -21,7 +21,7 @@ import model.User;
 public class UserController {
 
     private final UserDAO userDao = new UserDAO();
-    private final TokenDAO tokenDAO = new TokenDAO(); 
+    private final TokenDAO tokenDAO = new TokenDAO();
     private final ValidaCpf validaCpf = new ValidaCpf();
 
     public User getUserById(Integer idUser) {
@@ -31,43 +31,27 @@ public class UserController {
     public User getUserByCpf(User user) {
         return this.userDao.searchByCpf(user.getCpf());
     }
-    
+
     public User getUserByEmail(User user) {
         return this.userDao.searchByEmail(user.getEmail());
     }
-    
-      public UserDTO login(User user) {        
+
+    public UserDTO login(User user) {
         user = this.userDao.login(user);
-        if(user != null){
+        if (user != null) {
             String token = (new JWTTokenUtils()).generateToken(user);
-                     
+
             Token token1 = tokenDAO.insertToken(token, user.getId());
-            
-            UserDTO userDTO = new UserDTO(user.getEmail(),user.getId() ,user.getProfile(), token, user.getName(), user.getId());
+
+            UserDTO userDTO = new UserDTO(user.getEmail(), user.getId(), user.getProfile(), token, user.getName(), user.getId());
             return userDTO;
         }
         return null;
     }
-        
-    public User insert(User user) throws Exception {
-        try {            
-            User userExist = getUserByCpf(user);
-            User user2 = getUserByEmail(user);
-            
-            if(userExist == null){
-                user.setStatus(true);
-                user.setPassword("123");
-                userDao.insertUser(user);                
-            }
-            if (user2 == null){ //valida email
-                user.setStatus(true);
-                user.setPassword("123");
-                userDao.insertUser(user);                 
-            }
-            else{
-                return null;                      
-            }           
 
+    public User insert(User user) throws Exception {
+        try {
+            userDao.insertUser(user);
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar usuário");
         }
@@ -81,7 +65,7 @@ public class UserController {
             throw new Exception("Não foi possível listar usuários");
         }
     }
-    
+
     public List<User> usersByProfile() throws Exception {
         try {
             return userDao.usersByProfile();
@@ -108,19 +92,19 @@ public class UserController {
         if (user.getStatus() != selectedUser.getStatus()) {
             selectedUser.setStatus(user.getStatus());
         }
-        
-        if (user.getProfile()!= selectedUser.getProfile()){
+
+        if (user.getProfile() != selectedUser.getProfile()) {
             selectedUser.setProfile(user.getProfile());
-        }           
-                
-        if (user.getCpf()!= selectedUser.getCpf()){
+        }
+
+        if (user.getCpf() != selectedUser.getCpf()) {
             selectedUser.setCpf(user.getCpf());
-        }    
-        
-        if (user.getSetor()!= selectedUser.getSetor()){
+        }
+
+        if (user.getSetor() != selectedUser.getSetor()) {
             selectedUser.setSetor(user.getSetor());
         }
-        
+
         return this.userDao.update(selectedUser);
     }
 
