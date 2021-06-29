@@ -38,6 +38,7 @@ public class UserResource {
 
     private final UserController userController;
     private final ValidaCpf validaCpf = new ValidaCpf();
+    private final ReportResource reportResource = new ReportResource();
 
     /**
      * Creates a new instance of GenericResource

@@ -40,6 +40,7 @@ public class TicketResource {
 
     private final TicketController ticketController;
     private final ProjectController projectController = new ProjectController();
+    private final UserController userController = new UserController();
 
     /**
      * Creates a new instance of GenericResource
@@ -101,12 +102,13 @@ public class TicketResource {
     }
 
     @POST
+    @Path("/{idUser}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response insert(Ticket ticket) throws Exception {
+    public Response insert(@PathParam("idUser") String idUserlogado, Ticket ticket) throws Exception {
 
         //COLCOAR AQUI UMA VALIDAÇÃO PARA O CASO DO SOLICITANTE ESTIVER DESATIVADO, NAO PODE CADASTRAR
-        ticket = this.ticketController.insert(ticket);
+        ticket = this.ticketController.insert(ticket, userController.getUserById(Integer.parseInt(idUserlogado)));
         return Response
                 .ok(Response.Status.CREATED)
                 .entity(ticket)
@@ -114,12 +116,13 @@ public class TicketResource {
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("/{id}/ticket/{idUser}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response update(@PathParam("id") String id, Ticket ticket) throws Exception {
+    public Response update(@PathParam("id") String id, Ticket ticket, @PathParam("idUser") String idUserLogado) throws Exception {
         ticket.setId(Integer.parseInt(id));
-        ticket = this.ticketController.update(ticket);
+        User userLogado = userController.getUserById(Integer.parseInt(idUserLogado));
+        ticket = this.ticketController.update(ticket, userLogado);
         return Response
                 .ok()
                 .entity(ticket)

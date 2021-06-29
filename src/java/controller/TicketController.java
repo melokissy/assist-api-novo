@@ -37,7 +37,7 @@ public class TicketController {
 
     private String status = "Resolvido";
 
-    public Ticket insert(Ticket ticket) throws Exception {
+    public Ticket insert(Ticket ticket, User userLogado) throws Exception {
         try {
 
             int contador = tDAO.countTickets() + 1;
@@ -50,7 +50,7 @@ public class TicketController {
 
             ticket.setStatus("Pendente");
             tDAO.insertTicket(ticket);
-            saveHistoric("Ticket criado", ticket);
+            saveHistoric("Ticket criado", ticket, userLogado);
 
         } catch (Exception e) {
             throw new Exception("Não foi possivel cadastrar ticket");
@@ -127,6 +127,41 @@ public class TicketController {
         return tickets;
     }
 
+    public List<Ticket> ticketByResponsible(Integer idResponsible) throws Exception {
+
+        List<Ticket> tickets = this.tDAO.ticketsByResponsible(idResponsible);
+        if (!tickets.isEmpty()) {
+            for (int i = 0; i < tickets.size(); i++) {
+                if (tickets.get(i).getRequester().getId() != null) {
+                    try {
+                        User usuario = userController.getUserById(tickets.get(i).getRequester().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setRequester(usuario);
+                    } catch (Exception e) {
+                        System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
+                    }
+
+                }
+                try {
+                    if (tickets.get(i).getResponsible().getId() > 0) {
+                        User usuario = userController.getUserById(tickets.get(i).getResponsible().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setResponsible(usuario);
+                    } else if (tickets.get(i).getResponsible().getId() == 0 || tickets.get(i).getResponsible().getId() == null) {
+                        User usuario = new User();
+                        tickets.get(i).setResponsible(usuario);
+                    }
+                } catch (Exception e) {
+                    System.out.println("[ TICKET CONTROLLER - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
+
+                }
+
+            }
+        }
+
+        return tickets;
+    }
+    
     public Ticket search(Integer id) throws Exception {
         try {
             Ticket ticket = tDAO.search(id);
@@ -196,7 +231,7 @@ public class TicketController {
         return tickets;
     }
 
-    public void saveHistoric(String description, Ticket ticket) throws Exception {
+    public void saveHistoric(String description, Ticket ticket, User userLogado) throws Exception {
         Historic historic = new Historic();
 
         historic.setDescription(description);
@@ -207,17 +242,18 @@ public class TicketController {
         if (ticket.getResponsible() != null) {
             historic.setTicket_responsible(ticket.getResponsible());
         }
+        historic.setUser(userLogado);
         historic.setTicket_id(ticket.getId());
         historic.setStatus(ticket.getStatus());
         historic.setCreatedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         historicController.insert(historic);
     }
 
-    public Ticket update(Ticket ticket) throws Exception {
+    public Ticket update(Ticket ticket, User userLogado) throws Exception {
 
         Ticket selectedTicket = this.tDAO.search(ticket.getId());
 
-        if (ticket.getSubject() != null) {
+        if (ticket.getSubject() != null){
             selectedTicket.setSubject(ticket.getSubject());
         }
 
@@ -243,7 +279,8 @@ public class TicketController {
 
         selectedTicket.setEditedAt(java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         Ticket response = this.tDAO.update(selectedTicket);
-        saveHistoric("Ticket atualizado", selectedTicket);
+        saveHistoric("Ticket atualizado", selectedTicket, userLogado);
+        response.setRequester(userController.getUserById(response.getRequester().getId()));
         return response;
 
     }

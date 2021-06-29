@@ -96,6 +96,20 @@ public class TicketDAO {
             + "                t.closedAt,  "
             + "                t.dueDate "
             + "                FROM ticket t WHERE project_id = ?";
+    private static final String SEARCH_BY_RESPONSIBLE = "SELECT distinct t.idTicket, "
+            + "t.number,"
+            + "                t.subject,  "
+            + "                t.description,  "
+            + "                t.requester_id,  "
+            + "                t.type,  "
+            + "                t.priority,  "
+            + "                t.status,  "
+            + "                t.responsible_id,  "
+            + "                t.createdAt,  "
+            + "                t.editedAt,  "
+            + "                t.closedAt,  "
+            + "                t.dueDate "
+            + "                FROM ticket t WHERE responsible_id = ?";
     private static final String APROPRIAR_TICKET = "update ticket set reponsible_id = ? where idTicket = ?";
 
     public TicketDAO() {
@@ -249,6 +263,74 @@ public class TicketDAO {
 
             Project project = new Project();
             prepared.setInt(1, idProject);
+
+            rs = prepared.executeQuery();
+
+            while (rs.next()) {
+                Ticket ticket = new Ticket();
+                ticket.setId(rs.getInt(1));
+                ticket.setNumber(rs.getString(2));
+                ticket.setSubject(rs.getString(3));
+                ticket.setDescription(rs.getString(4));
+
+                //id e nome do usuario solicitante
+                User userRequest = new User();
+                userRequest.setId(rs.getInt(5));
+                ticket.setRequester(userRequest);
+
+                ticket.setType(rs.getString(6));
+                ticket.setPriority(rs.getString(7));
+                ticket.setStatus(rs.getString(8));
+
+                //pega o ususario responsavel
+                User userResponsible = new User();
+                userResponsible.setId(rs.getInt(9));
+                ticket.setResponsible(userResponsible);
+
+                ticket.setCreatedAt(rs.getDate(10));
+                ticket.setEditedAt(rs.getDate(11));
+                ticket.setClosedAt(rs.getDate(12));
+                ticket.setDueDate(rs.getDate(13));
+                list.add(ticket);
+            }
+
+            return list;
+            
+        } catch (Exception e) {
+            System.out.println("ERROR LISTA TICKETS BY PROJECT - " + e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+
+                if (prepared != null) {
+                    prepared.close();
+                }
+
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error close connections" + ex.getMessage());
+            }
+        }
+
+        return null;
+    }
+    
+    public List<Ticket> ticketsByResponsible(int idResponsible) {
+        Connection conn = null;
+        List<Ticket> list =  new ArrayList<>();
+        PreparedStatement prepared = null;
+        ResultSet rs = null;
+
+        try {
+            conn = new ConnectionFactory().getConnection();
+            prepared = conn.prepareStatement(SEARCH_BY_RESPONSIBLE);
+
+            Project project = new Project();
+            prepared.setInt(1, idResponsible);
 
             rs = prepared.executeQuery();
 

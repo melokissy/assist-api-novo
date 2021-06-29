@@ -52,4 +52,22 @@ public class ReportResource {
                 .build();
     }
     
+    @GET
+    @Path("/ticket-by-responsible/{id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response searchByResponsible(@PathParam("id") String id) throws Exception {
+
+        Integer idResponsible = 0;
+        idResponsible = Integer.parseInt(id);
+
+        List<Ticket> tickets = this.ticketController.ticketByResponsible(idResponsible);
+        
+        GenericEntity<List<Ticket>> list = new GenericEntity<List<Ticket>>(tickets) {
+        };
+        return Response
+                .ok()
+                .entity(list)
+                .build();
+    }
+    
 }
