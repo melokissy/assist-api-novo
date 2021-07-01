@@ -161,6 +161,24 @@ public class TicketResource {
                 .entity(ticket)
                 .build();
     }
+        
+    @GET
+    @Path("/ticket-by-user/{id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response searchByUser(@PathParam("id") String id) throws Exception {
+
+        Integer idUser = 0;
+        idUser = Integer.parseInt(id);
+
+        List<Ticket> tickets = this.ticketController.ticketByUser(idUser);
+        
+        GenericEntity<List<Ticket>> list = new GenericEntity<List<Ticket>>(tickets) {
+        };
+        return Response
+                .ok()
+                .entity(list)
+                .build();
+    }
 
     @DELETE
     @Path("/{id}")

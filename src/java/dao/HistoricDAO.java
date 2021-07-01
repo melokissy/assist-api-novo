@@ -25,7 +25,7 @@ public class HistoricDAO {
 
     private static final String SEARCH = "SELECT distinct * FROM historic";
     private static final String SEARCH_BY_TICKET = "SELECT distinct idHistoric, ticket_id, user_id, description, createdAt, status, subject, ticket_description, "
-            + "responsible_id, priority, type from historic WHERE ticket_id=?";
+            + "responsible_id, priority, type from historic WHERE ticket_id=? order by createdAt desc";
     private static final String NEW_HISTORIC = "INSERT INTO historic (ticket_id, user_id, description, createdAt, status,  subject, ticket_description, "
             + "responsible_id, priority, type) VALUES (?,?,?,?,?,?,?,?,?,?)";
 

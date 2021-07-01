@@ -162,6 +162,41 @@ public class TicketController {
         return tickets;
     }
     
+    public List<Ticket> ticketByUser(Integer idUser) throws Exception {
+
+        List<Ticket> tickets = this.tDAO.ticketsByUser(idUser);
+        if (!tickets.isEmpty()) {
+            for (int i = 0; i < tickets.size(); i++) {
+                if (tickets.get(i).getRequester().getId() != null) {
+                    try {
+                        User usuario = userController.getUserById(tickets.get(i).getRequester().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setRequester(usuario);
+                    } catch (Exception e) {
+                        System.out.println("[NAO LOCALIZOU O REQUESTER] - " + e.getMessage());
+                    }
+
+                }
+                try {
+                    if (tickets.get(i).getResponsible().getId() > 0) {
+                        User usuario = userController.getUserById(tickets.get(i).getResponsible().getId());
+                        usuario.setPassword("");
+                        tickets.get(i).setResponsible(usuario);
+                    } else if (tickets.get(i).getResponsible().getId() == 0 || tickets.get(i).getResponsible().getId() == null) {
+                        User usuario = new User();
+                        tickets.get(i).setResponsible(usuario);
+                    }
+                } catch (Exception e) {
+                    System.out.println("[ TICKET CONTROLLER - VALIDACAO DO RESPONSIBLE] - " + e.getMessage());
+
+                }
+
+            }
+        }
+
+        return tickets;
+    }
+    
     public Ticket search(Integer id) throws Exception {
         try {
             Ticket ticket = tDAO.search(id);
@@ -292,6 +327,7 @@ public class TicketController {
             if (!selectedTicket.getStatus().equals("Resolvido")) {
                 return this.tDAO.resolveTicket(selectedTicket);
             }
+            
             return selectedTicket;
         } catch (Exception e) {
             throw new Exception("Ticket já se encontra resolvido");
